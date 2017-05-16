@@ -1,6 +1,7 @@
 class sshd {
 
         package { 'openssh-server':
+
                 ensure => "installed",
 
         }
@@ -13,6 +14,7 @@ class sshd {
         }
 
         file { '/etc/ssh/sshd_config':
+                
                 content => template("/etc/puppet/modules/sshd/templates/sshd_config"),
                 notify => Service["ssh"],
 
