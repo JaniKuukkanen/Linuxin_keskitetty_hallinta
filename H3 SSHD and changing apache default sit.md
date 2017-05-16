@@ -10,29 +10,29 @@
 
 Alkuun loin hakemistot $ mkdir /etc/puppet/modules/sshd/templates ja sshd/manifests. Tämän jälkeen asensin openssh-server paketin (sudo apt-get install openssh-server), jotta voin kopioda sshd_config tiedoston templatea varten, jota tulen käyttämään tässä modulissa. Kun asennus on valmis kopion kyseisen config tiedoston aika semmin tehtyyn templates hakemistoon (sudo cp /etc/ssh/sshd_config /etc/puppet/modules/sshd/templates/). Tämän jälkeen muokkaan (nano /etc/puppet/modules/sshd/templates/sshd_config) kopiosta portin "port:22" porttiin "port:2222". Seuraavaksi teen init.pp tiedoston aikasemmin tehtyyn (/etc/puppet/modules/sshd/manifests) hakemistoon, jonne teen modulin (nano init.pp).
 
-class sshd {
+ 	class sshd {
 	
-	package { 'openssh-server':
+		package { 'openssh-server':
 
-                ensure => "installed",
+                	ensure => "installed",
 
-        }
+        	}
 
-        service { 'ssh':
+        	service { 'ssh':
 
-                ensure => 'running',
-                enable => true,
+                	ensure => 'running',
+                	enable => true,
 
-        }
+        	}
 
-        file { '/etc/ssh/sshd_config':
+        	file { '/etc/ssh/sshd_config':
                 
-                content => template("/etc/puppet/modules/sshd/templates/sshd_config"),
-                notify => Service["ssh"],
+                	content => template("/etc/puppet/modules/sshd/templates/sshd_config"),
+                	notify => Service["ssh"],
 
-        }
+        	}
 
-}
+	}
 
 Moduli siis asentaa openssh-server paketin (tosin meillähän se on jo asennettuna), varmistaa että se on käynnissä ja muuttaa sshd_config tiedoston templaten mukaiseksi minkä loimme aikaisemmin, eli siis se muuttaa ssh portin 22 -> 2222. Ajettuani modulin (sudo puppet apply -e class {"sshd:"}') sain tuloksen:
 
@@ -49,26 +49,26 @@ Moduli siis toimii niin kuin kuuluukin.
 Aloitin luomalla hakemiston uudelle modulille $ mkdir /etc/puppet/modules/apache/manifests, jonne tein init.pp (nano init.pp)
 tiedoston.
 
-class apache {
+	class apache {
 	
-  	package {'apache2':
-		ensure => "installed",
+  		package {'apache2':
+			ensure => "installed",
+
+		}
+
+		service {'apache2':
+			enable => true,
+			ensure => "running",
+
+		}
+
+		file {'/var/www/html/index.html':
+			content => "<html><H1>Testi</H1></html>",
+			notify => Service["apache2"],
+
+		}
 
 	}
-
-	service {'apache2':
-		enable => true,
-		ensure => "running",
-
-	}
-
-	file {'/var/www/html/index.html':
-		content => "<html><H1>Testi</H1></html>",
-		notify => Service["apache2"],
-
-	}
-
-}
 
 Moduli siis asentaa apache2 paketin, varmistaa että se on päällä ja muuttaa apachen default sivun (index.html). Tässä tapauksessa 
 sivusto saa vain otsikon "Testi". 
